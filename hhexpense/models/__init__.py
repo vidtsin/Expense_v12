@@ -8,5 +8,5 @@ from . import hhexpense_attachment
 from . import hhexpense_acc_date
 from . import hhexpense_approving_manager
 # from . import hhexpense_report
-from . import res_config
+# from . import res_config
 from . import hhexpense_china_bank_account

@@ -45,7 +45,7 @@
 
         'views/template.xml',
 
-        'views/res_config.xml',
+        # 'views/res_config.xml',
 
         # 'report/print_expense_templates.xml',
         # 'report/print_expense_chinese_templates.xml',
