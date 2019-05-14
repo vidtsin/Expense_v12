@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_approve_employee_email_template" model="mail.template">
+          <field name="name">expense e-mail approve employee template</field>
+          <field name="email_from"><![CDATA["${object.company_id.name|safe}" <${(object.company_id.email or user.email)|safe}>]]></field>
+          <field name="subject">Your expense (${object.name}) has been approved</field>
+          <field name="email_to">${object.employee_id.work_email|safe}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hhexpense.model_hhexpense_hhexpense"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+                <![CDATA[
+                  % set company = record and record.company_id or user.company_id
+              <div style="user-select:none; padding:0; margin:0;">
+                  <table align="center" border="0" width="100%" style="border-collapse:collapse; padding-left:40px; padding-right:40px;">
+                    <tbody>
+                        <!-- HEADER -->
+                        <tr >
+                            <td>
+                                <img src="https://image.ibb.co/dbUXzz/logo.png" alt="${company.name}"/>
+                                <p style="margin-bottom:0px;"><br/></p>
+                            </td>
+                        </tr>
+                        <hr/>
+                        <!-- CONTENT -->
+                        <tr>
+                            <td style="padding-top:25px;">
+                                <span >
+                                    Dear ${(object.employee_id.name)},
+                                </span>
+                                <div style="margin-bottom:0px;">
+                                    <p>${(user.name)} has <strong>APPROVED</strong> the below expense:</p>
+                                    <p><strong>"${object.name}"</strong></p>
+                                    <p>Please <a href=${object.to_approve_url}>login</a> to the e-Expense system to view the details.</p>
+                                    <p>Thank you for your attention.</p>
+                                    <br/>
+                                    <p >For enquiry please contact Accounting Department: Shirley Pun (<a href="mailto:ailsa.xu@hunghingprinting.com">shirley.pun@hunghingprinting.com</a>) / ext.631</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <hr/>
+                        <!-- FOOTER -->
+                        <tr>
+                            <td>
+                                <div style="font-size:13px; color:#999999;padding-top:15px;">
+                                    * This is a system-generated message, please do not reply.
+                                </div>
+                                <p><br/></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                   </table>
+              </div>
+              ]]>
+          </field>
+       </record>
+    </data>
+</odoo>
+
+
+
+

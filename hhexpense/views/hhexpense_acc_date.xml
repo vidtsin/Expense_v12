@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- InputAnticipatedUploadDate form view -->
+    <record id="hhexpense_anticipated_date_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.anticipated.date.view.form</field>
+        <field name="model">hhexpense.anticipated.date</field>
+        <field name="arch" type="xml">
+            <form edit="0" create="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="has_input" invisible="1"/>
+                        </group>
+                        <!--<field name="message" attrs="{'invisible':[('has_input', '=', False)]}"/>-->
+                        <group>
+                            <!--<field name="has_input" invisible="1"/>-->
+                            <button string='Download Reports' name="generate_reports" type="object" class="oe_highlight oe_right" attrs="{'invisible': [('has_input', '=', False)]}"/>
+                            <!--<button string='Download HSBC File' name="auto_processing" type="object" class="oe_highlight oe_right" attrs="{'invisible': [('has_input', '=', False)]}"/>-->
+                            <!--<button string="Cancel" class="btn-default oe_right" special="cancel" />-->
+                        </group>
+                    </group>
+                    <!--<group>-->
+                        <!--<footer>-->
+                            <!--&lt;!&ndash; oe_subtotal_footer oe_right &ndash;&gt;-->
+                            <!--<button string='Save payment date' name="function_two" type="object" class="oe_highlight oe_subtotal_footer"/>-->
+                            <!--<button string="Cancel" class="btn-default" special="cancel" />-->
+                        <!--</footer>-->
+                    <!--</group>-->
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for InputAnticipatedUploadDate -->
+    <record id="hhexpense_debit_category_action" model="ir.actions.act_window">
+        <field name="name">Input Anticipated Upload Date</field>
+        <field name="res_model">hhexpense.anticipated.date</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <!-- InputPaymentApprovedDate form view -->
+    <record id="hhexpense_payment_date_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.payment.date.view.form</field>
+        <field name="model">hhexpense.payment.date</field>
+        <field name="arch" type="xml">
+            <form edit="0" create="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="has_input" invisible="1"/>
+                        </group>
+                        <group>
+                            <button string='Post' name="auto_post_processing" type="object" class="oe_highlight oe_right" attrs="{'invisible': [('has_input', '=', False)]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for InputPaymentApprovedDate -->
+    <!--<record id="hhexpense_payment_date_action" model="ir.actions.act_window">-->
+        <!--<field name="name">Input Payment Approved Date</field>-->
+        <!--<field name="res_model">hhexpense.payment.date</field>-->
+        <!--<field name="view_mode">form</field>-->
+    <!--</record>-->
+
+</odoo>
+

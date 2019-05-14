@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<odoo>
+    <!--approve-->
+    <!-- approving_manager tree view -->
+    <record id="hhexpense_approving_manager_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.approving.manager.view.tree</field>
+        <field name="model">hhexpense.approving.manager</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_name"/>
+                <field name="employee_email"/>
+                <field name="approving_manager_name"/>
+                <field name="approving_manager_email"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- approving_manager form view -->
+    <record id="hhexpense_approving_manager_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.approving.manager.view.form</field>
+        <field name="model">hhexpense.approving.manager</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="employee_name"/>
+                        <field name="employee_email"/>
+                    </group>
+                    <group>
+                        <field name="approving_manager_name"/>
+                        <field name="approving_manager_email"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hhexpense_approving_manager_action" model="ir.actions.act_window">
+        <!-- Update/Manage approving_manager -->
+        <field name="name">Approving Manager List</field>
+        <field name="res_model">hhexpense.approving.manager</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="hhexpense_approving_manager_menu" name="Approving Manager" sequence="3" parent="hhexpense_menu_config" action="hhexpense_approving_manager_action"/>
+
+
+    <!--&lt;!&ndash;review&ndash;&gt;-->
+    <!--&lt;!&ndash; reviewing_accountant tree view &ndash;&gt;-->
+    <!--<record id="hhexpense_reviewing_accountant_view_tree" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.reviewing.accountant.view.tree</field>-->
+        <!--<field name="model">hhexpense.reviewing.accountant</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<tree>-->
+                <!--<field name="manager_name"/>-->
+                <!--<field name="manager_email"/>-->
+                <!--<field name="reviewing_accountant_name"/>-->
+                <!--<field name="reviewing_accountant_email"/>-->
+            <!--</tree>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!--&lt;!&ndash; reviewing_accountant form view &ndash;&gt;-->
+    <!--<record id="hhexpense_reviewing_accountant_view_form" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.reviewing.accountant.view.tree</field>-->
+        <!--<field name="model">hhexpense.reviewing.accountant</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<form>-->
+                <!--<sheet>-->
+                    <!--<group>-->
+                        <!--<field name="manager_name"/>-->
+                        <!--<field name="manager_email"/>-->
+                    <!--</group>-->
+                    <!--<group>-->
+                        <!--<field name="reviewing_accountant_name"/>-->
+                        <!--<field name="reviewing_accountant_email"/>-->
+                    <!--</group>-->
+                <!--</sheet>-->
+            <!--</form>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!--<record id="hhexpense_reviewing_accountant_action" model="ir.actions.act_window">-->
+        <!--&lt;!&ndash; Update/Manage reviewing_accountant &ndash;&gt;-->
+        <!--<field name="name">Reviewing Accountant List</field>-->
+        <!--<field name="res_model">hhexpense.reviewing.accountant</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+    <!--</record>-->
+
+    <!--<menuitem id="hhexpense_reviewing_accountant_menu" name="Reviewing Accountant" parent="hhexpense_menu_config" action="hhexpense_reviewing_accountant_action"/>-->
+
+
+    <!--&lt;!&ndash;verify&ndash;&gt;-->
+    <!--&lt;!&ndash; verifying_accountant tree view &ndash;&gt;-->
+    <!--<record id="hhexpense_verifying_accountant_view_tree" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.verifying.accountant.view.tree</field>-->
+        <!--<field name="model">hhexpense.verifying.accountant</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<tree>-->
+                <!--<field name="reviewer_name"/>-->
+                <!--<field name="reviewer_email"/>-->
+                <!--<field name="verifying_accountant_name"/>-->
+                <!--<field name="verifying_accountant_email"/>-->
+            <!--</tree>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!--&lt;!&ndash; verifying_accountant form view &ndash;&gt;-->
+    <!--<record id="hhexpense_verifying_accountant_view_form" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.verifying.accountant.view.tree</field>-->
+        <!--<field name="model">hhexpense.verifying.accountant</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<form>-->
+                <!--<sheet>-->
+                    <!--<group>-->
+                        <!--<field name="reviewer_name"/>-->
+                        <!--<field name="reviewer_email"/>-->
+                    <!--</group>-->
+                    <!--<group>-->
+                        <!--<field name="verifying_accountant_name"/>-->
+                        <!--<field name="verifying_accountant_email"/>-->
+                    <!--</group>-->
+                <!--</sheet>-->
+            <!--</form>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!--<record id="hhexpense_verifying_accountant_action" model="ir.actions.act_window">-->
+        <!--&lt;!&ndash; Update/Manage verifying_accountant &ndash;&gt;-->
+        <!--<field name="name">Verifying Accountant List</field>-->
+        <!--<field name="res_model">hhexpense.verifying.accountant</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+    <!--</record>-->
+
+    <!--<menuitem id="hhexpense_verifying_accountant_menu" name="Verifying Accountant" parent="hhexpense_menu_config" action="hhexpense_verifying_accountant_action"/>-->
+
+     <!--update approving reviewing verifying manager info-->
+    <record id="hhexpense_approving_manager_action_server" model="ir.actions.server">
+        <field name="name">Update Approving Manager</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hhexpense_approving_manager"/>
+        <field name="binding_model_id" ref="model_hhexpense_approving_manager"/>
+        <field name="state">code</field>
+        <field name="code">
+            for record in records:
+                action = record.update_approving_manager_list()
+        </field>
+    </record>
+
+    <!--<record id="hhexpense_reviewing_accountant_action_server" model="ir.actions.server">-->
+        <!--<field name="name">Update Reviewing Accountant</field>-->
+        <!--<field name="type">ir.actions.server</field>-->
+        <!--<field name="model_id" ref="model_hhexpense_reviewing_accountant"/>-->
+        <!--<field name="binding_model_id" ref="model_hhexpense_reviewing_accountant"/>-->
+        <!--<field name="state">code</field>-->
+        <!--<field name="code">-->
+            <!--for record in records:-->
+                <!--action = record.update_reviewing_accountant_list()-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!--<record id="hhexpense_verifying_accountant_action_server" model="ir.actions.server">-->
+        <!--<field name="name">Update Verifying Accountant</field>-->
+        <!--<field name="type">ir.actions.server</field>-->
+        <!--<field name="model_id" ref="model_hhexpense_verifying_accountant"/>-->
+        <!--<field name="binding_model_id" ref="model_hhexpense_verifying_accountant"/>-->
+        <!--<field name="state">code</field>-->
+        <!--<field name="code">-->
+            <!--for record in records:-->
+                <!--action = record.update_verifying_accountant_list()-->
+        <!--</field>-->
+    <!--</record>-->
+
+</odoo>

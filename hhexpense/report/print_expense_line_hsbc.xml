@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="print_hsbc_file">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!--<h2>HH Expenses Report</h2>-->
+
+                        <table class="table report_bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th><h5><b>Identifier</b></h5></th>
+                                    <th><h5><b>Account Name</b></h5></th>
+                                    <th><h5><b>Amount</b></h5></th>
+                                </tr>
+                                <tr>
+                                    <!--<t t-foreach="data" t-as="d">-->
+                                        <!--<th><span t-esc="d.name"></span></th>-->
+                                    <th>fdsfds</th>
+                                    <th>David Yao</th>
+                                    <th>123456</th>
+                                    <!--</t>-->
+
+                                </tr>
+                                <tr>
+                                    <th><h5><b>The End</b></h5></th>
+                                    <th><h5><b>The End</b></h5></th>
+                                    <th><h5><b>The End</b></h5></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="data" t-as="d">
+                                    <tr >
+                                        <td>
+                                            <span t-esc="d.name"></span>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.expense_line_name"></span>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.expense_line_calculate"></span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+
+                        <p style="text-align: right"><br/><br/><br/>Certified honest and conform</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="hhexpense_action_print_hsbc_file"
+        string="HSBC Review Report"
+        model="hhexpense.line"
+        report_type="qweb-pdf"
+        name="hhexpense.print_hsbc_file"
+        file="hhexpense.print_hsbc_file"
+    />
+
+</odoo>

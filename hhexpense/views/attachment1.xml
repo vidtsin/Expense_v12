@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+    <!--ir.ui.view-->
+        <!--kanban view for draft, rejected state-->
+        <record model="ir.ui.view" id="expense_view_document_file_kanban">
+            <field name="name">hhexpense.hhexpense.kanban</field>
+            <field name="model">hhexpense.attachment</field>
+            <field name="inherit_id" ref="mail.view_document_file_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="/kanban/templates/t/div" position="replace">
+                    <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_vignette">
+                            <div class="oe_attachment">
+                                <div class="oe_name" style="font-size:20px; overflow:hidden;">
+                                    <field name="name"/>
+                                    <field name="state" invisible="1"/>
+                                </div>
+                                <div t-if="record.type.raw_value == 'binary'" style="margin-left: 23%;">
+                                    <t t-set="type" t-value="record.mimetype.value.split('/').shift()"/>
+                                    <div t-attf-class="o_attachment" title="Double click to open the file">
+                                        <!--<html>-->
+                                        <!--<head>-->
+                                            <!--<script type="text/javascript" src="/hhexpense/static/src/js/attachment.js"></script>-->
+                                            <!--<link rel="stylesheet" href="/hhexpense/static/src/css/attachment.css"/>-->
+                                        <!--</head>-->
+                                        <!--<body>-->
+                                        <t t-if="type == 'image'">
+                                            <div class="o_image_box">
+                                                <img t-attf-src="/web/image/#{record.id.raw_value}/200x200/?crop=True" class="file_img"
+                                                     ondblclick="_onAttachmentViewImg(this);"/>
+                                                <a class="my_attachment_download"
+                                                   t-attf-href="/web/content/#{record.id.raw_value}?download=1" target="_blank" >
+                                                    <img src="/hhexpense/static/src/img/download.png"
+                                                         title="Download this attachment" aria-hidden="true"></img>
+                                                </a>
+
+                                                <a type="delete" class='my_attachment_delete'
+                                                   attrs="{'invisible':[('state', 'in' , ['submitted','approved','posted'])]}">
+                                                    <img src="/hhexpense/static/src/img/delete.png" title="Delete this attachment" aria-hidden="true"></img>
+                                                </a>
+                                            </div>
+                                        </t>
+                                        <t t-if="record.mimetype.value == 'application/pdf'">
+                                            <div class="o_image_box">
+                                                <img t-attf-src="/web/static/src/img/mimetypes/pdf.png" class="file_img"
+                                                     ondblclick="_onAttachmentViewPdf(this);" />
+                                                <a class="my_attachment_download" t-attf-href="/web/content/#{record.id.raw_value}?download=1" target="_blank" >
+                                                    <img src="/hhexpense/static/src/img/download.png"
+                                                         title="Download this attachment"
+                                                         aria-hidden="true"></img>
+                                                </a>
+                                                <a type="delete" class='my_attachment_delete'
+                                                   attrs="{'invisible':[('state', 'in' , ['submitted','approved','posted'])]}">
+                                                    <img src="/hhexpense/static/src/img/delete.png" title="Delete this attachment" aria-hidden="true"></img>
+                                                </a>
+                                            </div>
+                                        </t>
+                                        <!--</body>-->
+                                        <!--</html>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!--kanban view for submitted, approved, posted state-->
+        <record model="ir.ui.view" id="expense_view_document_file_nomodify_kanban">
+            <field name="name">hhexpense.hhexpense.nomodify.kanban</field>
+            <field name="model">hhexpense.attachment</field>
+            <field name="inherit_id" ref="expense_view_document_file_kanban"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="/kanban" position="attributes">
+                    <attribute name="create">false</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!--form view of attachment-->
+        <record model="ir.ui.view" id="view_document_file_form">
+            <field name="name">hhexpense.hhexpense.form</field>
+            <field name="model">hhexpense.attachment</field>
+            <field name="inherit_id" ref="base.view_attachment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="attributes">
+                   <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    <!--action view-->
+
+
+        <!--action of kanban view for submitted, approved, posted state-->
+        <record id="expense_attachment_view_specification_kanban_nomodify" model="ir.actions.act_window.view">
+            <field name="sequence" eval="6"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="expense_view_document_file_nomodify_kanban"/>
+            <field name="act_window_id" ref="hhexpense_attachment_action_nomodify"/>
+        </record>
+
+         <!--action of kanban view for draft, rejected state-->
+        <record id="expense_attachment_view_specification_kanban" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="expense_view_document_file_kanban"/>
+            <field name="act_window_id" ref="hhexpense_attachment_action"/>
+        </record>
+
+        <!--action of form view-->
+        <record id="expense_attachment_view_specification_form" model="ir.actions.act_window.view">
+            <field name="sequence" eval="5"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_document_file_form"/>
+            <field name="act_window_id" ref="hhexpense_attachment_action"/>
+        </record>
+
+    <!--act window-->
+        <!--action of kanban view for submitted, approved, posted state-->
+        <record id="hhexpense_attachment_action_nomodify" model="ir.actions.act_window">
+            <field name="name">Attachment kanban nomodify</field>
+            <field name="res_model">hhexpense.attachment</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="domain">[('res_model', '=', 'hhexpense.hhexpense'),('res_id', '=', active_id)]</field>
+        </record>
+
+        <!--act window of kanban view for draft, rejected state-->
+        <record id="hhexpense_attachment_action" model="ir.actions.act_window">
+            <field name="name">Attachment kanban</field>
+            <field name="res_model">hhexpense.attachment</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="domain">[('res_model', '=', 'hhexpense.hhexpense'),('res_id', '=', active_id)]</field>
+        </record>
+
+    </data>
+</odoo>
+

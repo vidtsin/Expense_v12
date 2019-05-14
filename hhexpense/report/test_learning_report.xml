@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="just_test">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <!--<t t-esc="dir(o)" />-->
+                <!--<t t-esc="{attribute: getattr(o, attribute) for attribute in dir(o) if not attribute.startswith('__')}" />-->
+
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>hiiiiii</h2>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-xs-2">
+                                <strong>Employee:</strong>
+                                <p t-field="o.employee_id.name"/>
+                            </div>
+                            <div>
+                                <strong>Expense Summary:</strong>
+                                <p t-field="o.name"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Details Description</th>
+                                    <th>Amount</th>
+                                    <th>Currency</th>
+                                    <th>Pay in (bank/cash)</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.expense_line" t-as="line">
+                                    <td>
+                                        <span t-field="line.expense_line_name"></span>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.expense_line_cost"></span>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.expense_line_currency"></span>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.bank_or_cash_copy"></span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="line.expense_line_remarks"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!--<div class="row">-->
+                            <!--<div class="col-xs-4 pull-right">-->
+                                <!--<table class="table table-condensed">-->
+                                    <!--<tr class="border-black">-->
+                                        <!--<td><strong>Total</strong></td>-->
+                                        <!--<td class="text-right">-->
+                                            <!--<span t-field="o.calculate_total_amount"/>-->
+                                        <!--</td>-->
+                                    <!--</tr>-->
+                                <!--</table>-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <!--<p>Certified honest and conform,<br/>(Date and signature).<br/><br/></p>-->
+                        <p style="text-align: right"><br/><br/><br/>Certified honest and conform</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="hhexpense_action_just_test"
+        string="Expenses Report - just_test"
+        model="hhexpense.hhexpense"
+        report_type="qweb-pdf"
+        name="hhexpense.just_test"
+        file="hhexpense.just_test"
+        print_report_name="'just_test - %s' % (object.name)"
+    />
+
+</odoo>

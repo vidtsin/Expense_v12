@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_checkbox_remove_checkbox_remove,checkbox_remove.checkbox_remove,model_checkbox_remove_checkbox_remove,,1,0,0,0

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.hhexpense</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="90"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Expenses New" string="Expenses New" data-key="hhexpense" groups="hhexpense.group_hhexpense_admin">
+                        <h2>Email</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_draft_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="DRAFT status" for="accept_email_of_draft_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from DRAFT
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_submitted_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="SUBMITTED status" for="accept_email_of_submitted_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from SUBMITTED
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_approved_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="APPROVED status" for="accept_email_of_approved_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from APPROVED
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_rejected_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="REJECTED status" for="accept_email_of_rejected_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from REJECTED
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_reviewed_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="REVIEWED status"/>
+                                    <div class="text-muted" id="accept_email_of_reviewed_status">
+                                        Let us know whether you want to receive email from us when status changed to/from REVIEWED
+                                    </div>
+                                    <!--<div class="content-group"  attrs="{'invisible': [('accept_email_of_reviewed_status', '=', False)]}">-->
+                                        <!--<div class="row mt16" id="lower_limiting_value">-->
+                                            <!--<label for="lower_limiting_value" class="col-md-4 o_light_label"/>-->
+                                            <!--<field name="lower_limiting_value"/>-->
+                                        <!--</div>-->
+                                        <!--<div class="text-muted" id="lower_limiting_value">-->
+                                            <!--Receive email if expense amount over the lower limiting value.-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_verified_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="VERIFIED status" for="accept_email_of_verified_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from VERIFIED
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_paid_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="PAID status" for="accept_email_of_paid_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from PAID
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="accept_email_of_posted_status"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="POSTED status" for="accept_email_of_posted_status"/>
+                                    <div class="text-muted">
+                                        Let us know whether you want to receive email from us when status changed to/from POSTED
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="hhexpense_email_configuration_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'hhexpense'}</field>
+        </record>
+
+        <menuitem id="hhexpense_email_configuration_menu" name="Settings" sequence="8" parent="hhexpense_menu_config" action="hhexpense_email_configuration_action" groups="group_hhexpense_admin"/>
+    </data>
+</odoo>

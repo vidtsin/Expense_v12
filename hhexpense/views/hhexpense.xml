@@ -1,0 +1,1078 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Views(tree/form) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+    <!-- "My expenses" tree view -->
+    <!-- Base tree view -->
+    <record id="hhexpense_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.view.tree</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <!-- simply add " import="0" " will not work -->
+            <tree decoration-success="state=='approved'" decoration-bf="state!=''" decoration-danger="state=='rejected'">
+                <field name="attachment_num" invisible="1"/>
+                <field name="expense_num" groups="hhexpense.group_hhexpense_manager,hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                <field name="expense_create_date"/>
+                <field name="reviewer_reject_history_copy" invisible="1"/>
+                <field name="name"/>
+                <!--<field name="reject_reason" attrs="{'invisible':[('state', '!=', 'rejected')]}"/>-->
+                <field name="employee_name"/>
+                <!-- This is original code, not deleted cuz maybe we can learn how to use context.get(), it seems powerful -->
+                <!--<field name="sheet_id" invisible="not context.get('show_report', False)"/>-->
+                <!-- This is original code, not deleted cuz maybe we can get an idea on how to show icon on tree view -->
+                <!--<field name="total_amount" sum="Total Amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+                <field name="state"/>
+                <field name="rec_approver_name" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                <!-- attrs="{'invisible': [('state', '!=', 'paid')]}"  -->
+                <!--<field name="calculate_total_amount"/>-->
+                <field name="calculate_hkd_total_amount"/>
+                <field name="calculate_rmb_total_amount"/>
+                <button name="hhexpense_action_get_attachment_view" string="View Attachment" type="object" icon="fa-paperclip" attrs="{'invisible': [('attachment_num', '=', 0)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- "My/Review/Verify expenses" form view -->
+    <!-- Base Form view -->
+    <record id="hhexpense_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.view.form</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <!-- This is original header, it is interesting cuz: why using "expense_adding_line", it even not defined (?? cant find) -->
+                <!--<header invisible="context.get('expense_adding_line')"> XXXX </header>-->
+                <header>
+                    <!-- Button for user: submit/resubmit -->
+                    <button string="Submit to Manager" states="draft" name="submit_expense" type="object" class="oe_highlight o_expense_submit"/>
+                    <button string="Resubmit" states="rejected" name="resubmit_expense" type="object" groups="hhexpense.group_hhexpense_user" class="oe_highlight o_expense_submit"/>
+                    <!-- Button for manager: approve/reject -->
+                    <button string="Manager Approve" name="approve_expense" states="submitted" type="object" groups="hhexpense.group_hhexpense_manager" class="oe_highlight o_expense_sheet_approve"/>
+                    <button string="Reject" states="submitted" name="%(hhexpense.hhexpense_reject_wizard_action)d" type="action" groups="hhexpense.group_hhexpense_manager" context="{'hhexpense_reject_model':'hhexpense.hhexpense'}"/>
+                    <!-- Button for reviewer1: review -->
+                    <button string="Approve" states="approved" name="review_expense" type="object" groups="hhexpense.group_hhexpense_reviewers" class="oe_highlight o_expense_submit"/>
+                    <!-- Button for reviewer2: verify -->
+                    <!--<button string="Finance Approve" states="reviewed" name="verify_expense" type="object" groups="hhexpense.group_hhexpense_verifiers" class="oe_highlight o_expense_submit"/>-->
+                    <!-- Button for reviewer1&2: pay/reject -->
+                    <!--<button string="Mark as Paid" states="verified" name="pay_expense" type="object" groups="hhexpense.group_hhexpense_reviewers" class="oe_highlight o_expense_submit"/>-->
+                    <button string="Reject" states="approved" name="%(hhexpense.hhexpense_reject_wizard_action)d" type="action" groups="hhexpense.group_hhexpense_reviewers,-hhexpense.group_hhexpense_verifiers" context="{'hhexpense_reject_model':'hhexpense.hhexpense'}"/>
+                    <button string="Reject" states="reviewed" name="%(hhexpense.hhexpense_reject_wizard_action)d" type="action" groups="-hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers" context="{'hhexpense_reject_model':'hhexpense.hhexpense'}"/>
+                    <!-- Button for reviewer1-2(after payment): post -->
+                    <!--<button string="Post" states="paid" name="post_expenses" type="object" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers" class="oe_highlight o_expense_submit"/>-->
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/> <!-- statusbar_colors="{'draft:'blue', 'posted':'green'}" -->
+                </header>
+                <sheet>
+                    <div class="oe_button_box">
+                        <button name="hhexpense_action_get_attachment_view"
+                            class="oe_stat_button"
+                            icon="fa-book"
+                            type="object">
+                            <field name="attachment_num" widget="statinfo" string="Attachment"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Lunch with Customer"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="has_rmb_record" invisible="1"/>
+                            <field name="expense_create_date"/>
+                            <field name="employee_name"/>
+                            <!--<field name="expense_deptoexp_id" options="{'no_create': True}"/>-->
+                            <field name="employee_department"/>
+                            <!--<field name="is_marketing" invisible="1"/>-->
+                            <!--<field name="team_name" attrs="{'invisible':[('is_marketing', '=', False)]}" options="{'no_create': True}"/>-->
+                            <!--<field name="calculate_total_amount"/>-->
+                            <field name="calculate_hkd_total_amount"/>
+                            <field name="calculate_rmb_total_amount" attrs="{'invisible':[('has_rmb_record', '=', False)]}"/>
+                            <!--<field name="will_do_attachment" widget="url"/>-->
+                            <field name="confirm_invoice" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="expense_num" groups="hhexpense.group_hhexpense_manager,hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                            <field name="rec_approver_name" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                            <field name="rec_reviewer_name" groups="hhexpense.group_hhexpense_verifiers"/>
+                            <field name="reject_reason" style="font-weight:bold;color:red;" attrs="{'invisible':[('state', '!=', 'rejected')]}"/>
+                        </group>
+                    </group>
+                    <div>
+                        <label for="expense_line"/>
+                        <field name="expense_line">
+                            <form string="form view for line level date">
+                                <group>
+                                    <field name="expense_line_name"/>
+
+                                    <field name="expense_cate_id"/>
+                                    <!--<field name="expense_cate_acc_copy"/>-->
+                                    <field name="expense_debit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                                    <field name="expense_debit_acc_name" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                                    <!--<field name="expense_debit_id"/>-->
+                                    <!--<field name="debit_acc_copy"/>-->
+                                    <!--<field name="debit_acc_copy" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+
+                                    <!--<field name="credit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                    <!--<field name="credit_acc_desc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                    <field name="expense_line_date"/>
+                                    <field name="expense_line_currency"/>
+                                    <field name="expense_line_cost"/>
+                                    <field name="confirm_item_invoice"/>
+                                    <field name="corresponding_attachments_no"/>
+                                    <field name="pay_hkd_rmb"/>
+                                    <field name="exchange_rate"/>
+                                    <field name="expense_line_calculate"/>
+                                    <field name="has_batch_number" invisible="1"/>
+                                    <!--<field name="batch_number" attrs="{'invisible':[('has_batch_number','=', False)]}" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                </group>
+                            </form>
+                            <tree string="default/tree/list view for line level's date" editable="bottom">
+                                <field name="expense_id" invisible="1"/>
+                                <field name="expense_line_name"/>
+                                <field name="expense_cate_id"/>
+                                <field name="expense_cate_acc_copy" invisible="1"/>
+                                <field name="expense_debit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"
+                                                                headstyle='{"color": "orange:state==A"}'
+                                                                styles='{"color": "orange:state==A"}'
+                                                                context='{"A": "approved"}'/>
+                                <field name="expense_debit_acc_name" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                                <!--<field name="convert_dep_to_exp_type" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                <!--<field name="expense_debit_id" domain="[('expense_type', '=', convert_dep_to_exp_type)]"/>-->
+                                <!--<field name="debit_acc_copy" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                <!--<field name="debit_acc_copy"/>-->
+
+                                <!--<field name="credit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                <!--<field name="credit_acc_desc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                                <field name="expense_line_date"/>
+                                <field name="expense_line_currency"/>
+                                <field name="expense_line_cost"/>
+                                <field name="confirm_item_invoice"/>
+                                <field name="corresponding_attachments_no"/>
+                                <field name="pay_hkd_rmb"/>
+                                <field name="exchange_rate"/>
+                                <field name="expense_line_calculate"/>
+                                <field name="state" invisible="1"/>
+                                <field name="has_batch_number" invisible="1"/>
+                                <!--<field name="batch_number" attrs="{'invisible':[('has_batch_number','=', False)]}" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>-->
+                            </tree>
+                        </field>
+                    </div>
+                    <!--<div>-->
+                        <!--<field name="complete_info" invisible="1"/>-->
+                        <!--<label for="expense_attachment" attrs="{'invisible':[('complete_info','=',False)]}"/>-->
+                        <!--<field name="expense_attachment" attrs="{'invisible':[('complete_info','=',False)]}">-->
+                            <!--<form string="form view for attachment">-->
+                                <!--<sheet>-->
+                                    <!--<label for="name" class="oe_edit_only"/>-->
+                                    <!--<h1>-->
+                                        <!--<field name="name"/>-->
+                                    <!--</h1>-->
+                                    <!--<group>-->
+                                        <!--<group>-->
+                                            <!--<field name="datas" filename="datas_fname"/>-->
+                                        <!--</group>-->
+                                    <!--</group>-->
+                                <!--</sheet>-->
+                            <!--</form>-->
+                            <!--<tree string="list view for attachment">-->
+                                <!--<field name="name"/>-->
+                                <!--<field name="datas_fname"/>-->
+                                <!--<field name="company_id" groups="base.group_multi_company"/>-->
+                                <!--<field name="create_uid"/>-->
+                                <!--<field name="create_date"/>-->
+                                <!--<button name="preview_file" string="Preview Attached Documents" type="object" icon="fa-folder-open"/>-->
+                                <!--<button name="download_file" string="Download Attached Documents" type="object" icon="fa-download"/>-->
+                            <!--</tree>-->
+                        <!--</field>-->
+                    <!--</div>-->
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--&lt;!&ndash; Base kanban view test &ndash;&gt;-->
+    <!--<record id="=hhexpense_view_kanban" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.hhexpense.view.kanban</field>-->
+        <!--<field name="model">hhexpense.hhexpense</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<kanban default_group_by="state">-->
+                <!--&lt;!&ndash; declares fields to use in kanban logic. If the field is simply displayed in the kanban view,-->
+                <!--it does not need to be pre-declared. &ndash;&gt;-->
+                <!--&lt;!&ndash;<field name="name"/>&ndash;&gt;-->
+                <!--<field name="expense_line"/>-->
+                <!--&lt;!&ndash;<field name="label_one"/>&ndash;&gt;-->
+                <!--<templates>-->
+                    <!--<t t-name="kanban-box">-->
+                        <!--&lt;!&ndash; oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}} &ndash;&gt;-->
+                        <!--<div t-attf-class=" oe_kanban_global_click_edit oe_semantic_html_override-->
+                                            <!--oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">-->
+                            <!--<div class="oe_dropdown_kanban">-->
+                                <!--&lt;!&ndash; dropdown menu &ndash;&gt;-->
+                                <!--<div class="oe_dropdown_toggle">-->
+                                    <!--<i class="fa fa-bars fa-lg"/>-->
+                                    <!--<ul class="oe_dropdown_menu">-->
+                                        <!--<li>-->
+                                            <!--<a type="delete">Delete</a>-->
+                                        <!--</li>-->
+                                        <!--<li>-->
+                                            <!--<ul class="oe_kanban_colorpicker"-->
+                                                <!--data-field="color"/>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+                                <!--<div class="oe_clear"></div>-->
+                            <!--</div>-->
+                            <!--&lt;!&ndash;<div t-attf-class="oe_kanban_content">&ndash;&gt;-->
+                                <!--&lt;!&ndash;&lt;!&ndash; title &ndash;&gt;&ndash;&gt;-->
+                                <!--&lt;!&ndash;employee id:&ndash;&gt;-->
+                                <!--&lt;!&ndash;<field name="employee_id"/>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<br/>&ndash;&gt;-->
+                                <!--&lt;!&ndash;employee name:&ndash;&gt;-->
+                                <!--&lt;!&ndash;<field name="employee_name"/>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<br/>&ndash;&gt;-->
+                                <!--&lt;!&ndash;calculate total amount:&ndash;&gt;-->
+                                <!--&lt;!&ndash;<field name="calculate_total_amount"/>&ndash;&gt;-->
+                                <!--&lt;!&ndash;&lt;!&ndash;<br/>&ndash;&gt;&ndash;&gt;-->
+                            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                            <!--<div>-->
+                                <!--<label for="label_one"/>-->
+                                <!--<h3>-->
+                                    <!--<field name="label_one"/>-->
+                                <!--</h3>-->
+                                <!--<table style="width:100%">-->
+                                    <!--<tr>-->
+                                        <!--<th>Desription</th>-->
+                                        <!--<th>Currency</th>-->
+                                        <!--<th>Amount</th>-->
+                                    <!--</tr>-->
+                                    <!--<tr t-foreach="record.expense_line.raw_value" t-as="line">-->
+                                        <!--<td>-->
+                                            <!--&lt;!&ndash;<span t-field="line.expense_line_name"></span>&ndash;&gt;-->
+                                            <!--<t t-esc="line.expense_line_name"/>-->
+                                        <!--</td>-->
+                                        <!--<td>-->
+                                            <!--&lt;!&ndash;<span t-field="line.expense_line_currency"></span>&ndash;&gt;-->
+                                            <!--<t t-esc="line.expense_line_currency"/>-->
+                                        <!--</td>-->
+                                        <!--<td>-->
+                                            <!--&lt;!&ndash;<span t-field="line.expense_line_cost"></span>&ndash;&gt;-->
+                                            <!--<t t-esc="line.expense_line_cost"/>-->
+                                        <!--</td>-->
+                                    <!--</tr>-->
+                                <!--</table>-->
+
+                                <!--&lt;!&ndash; kanban do not recognize table in qweb style &ndash;&gt;-->
+                                <!--&lt;!&ndash;<table>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<thead>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<tr>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<th>Desription</th>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<th>Currency</th>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<th>Amount</th>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;</thead>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<tbody>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<tr t-foreach="record.expense_line.raw_value" t-as="line">&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<td>&ndash;&gt;-->
+                                                <!--&lt;!&ndash;<span t-field="line.expense_line_name"></span>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<td>&ndash;&gt;-->
+                                                <!--&lt;!&ndash;<span t-field="line.expense_line_currency"></span>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<td>&ndash;&gt;-->
+                                                <!--&lt;!&ndash;<span t-field="line.expense_line_cost"></span>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;</td>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;</tbody>&ndash;&gt;-->
+                                <!--&lt;!&ndash;</table>&ndash;&gt;-->
+
+                                <!--&lt;!&ndash;<field name="expense_line">&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<tree>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<field name="expense_line_name"/>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<field name="expense_line_currency"/>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;</tree>&ndash;&gt;-->
+                                <!--&lt;!&ndash;</field>&ndash;&gt;-->
+
+                                <!--&lt;!&ndash;<t t-foreach="record.expense_line.raw_value" t-as='o'>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<t t-esc="o.expense_line_name"/>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;&lt;!&ndash;<t t-esc="o.expense_line_currency.currency"/>&ndash;&gt;&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<t t-esc="o.expense_line_currency"/>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<br/>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;&lt;!&ndash;<t t-esc="o.expense_id[1]"/>&ndash;&gt;&ndash;&gt;-->
+                                <!--&lt;!&ndash;</t>&ndash;&gt;-->
+                            <!--</div>-->
+
+
+                        <!--</div>-->
+                    <!--</t>-->
+                <!--</templates>-->
+            <!--</kanban>-->
+        <!--</field>-->
+
+    <!--</record>-->
+    <!--&lt;!&ndash; Base  &ndash;&gt;-->
+
+    <!-- "Approve/Review/Verify expenses" tree view -->
+    <!-- Tree view that disable "create" function -->
+    <record id="hhexpense_view_tree_no_create" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.view.tree.no_create</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="inherit_id" ref="hhexpense_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- "Approve/Post expenses" form view -->
+    <!-- Form view that disable "edit" function -->
+    <record id="hhexpense_view_form_no_edit" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.view.form.no_edit</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="inherit_id" ref="hhexpense_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position='attributes'>
+                <attribute name="edit">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- "Bank Expense Details" tree view -->
+    <record id="hhexpense_line_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.line.view.tree.bank</field>
+        <field name="model">hhexpense.line</field>
+        <field name="arch" type="xml">
+            <tree edit="0" create="0">
+                <!--<field name="employee_name"/>-->
+                <!--<field name="expense_id"/>-->
+                <field name="expense_line_name"/>
+                <field name="expense_line_currency"/>
+                <field name="pay_hkd_rmb"/>
+                <!--<field name="expense_line_is_processing"/>-->
+                <!--<field name="anticipated_date"/>-->
+                <field name="state" invisible="1"/>
+                <field name="state_display_name"/>
+                <!--<field name="convert_dep_to_exp_type"/>-->
+                <!--<field name="expense_debit_id"/>-->
+                <!--<field name="debit_acc_copy"/>-->
+                <field name="expense_line_date"/>
+                <!--<field name="expense_line_calculate"/>-->
+                <field name="expense_line_hkd_display_amount"/>
+                <field name="expense_line_rmb_display_amount"/>
+            </tree>
+        </field>
+    </record>
+    <!-- "Bank Expense Details" form view -->
+    <record id="hhexpense_line_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.line.view.form.bank</field>
+        <field name="model">hhexpense.line</field>
+        <field name="arch" type="xml">
+            <form edit="0" create="0" delete="0">
+                <header>
+                    <!-- attrs="{'invisible': [('has_batch_number', '=', False)]}" -->
+                    <button string="Reject" name="%(hhexpense.hhexpense_reject_wizard_action)d" states="reviewed"
+                            type="action"
+                            context="{'hhexpense_reject_model':'hhexpense.hhexpense'}"
+                            groups="hhexpense.group_hhexpense_reviewers"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="expense_id"/>
+                        <h1>
+                            <field name="expense_id" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_name"/>
+                            <field name="expense_line_name"/>
+                            <field name="expense_line_currency"/>
+                            <!--<field name="has_batch_number" invisible="1"/>-->
+                            <!--<field name="batch_number" invisible="1"/>-->
+                            <field name="pay_hkd_rmb"/>
+                            <!--<field name="expense_line_is_processing"/>-->
+                        </group>
+                        <group>
+                            <!--<field name="anticipated_date"/>-->
+                            <field name="state" invisible="1"/>
+                            <field name="state_display_name"/>
+                            <field name="convert_dep_to_exp_type"/>
+                            <!--<field name="expense_debit_id"/>-->
+                            <!--<field name="debit_acc_copy"/>-->
+                            <field name="expense_line_date"/>
+                            <field name="expense_line_calculate"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hhexpense_line_view_form_no_reject_button" model="ir.ui.view">
+        <field name="name">hhexpense.line.view.form.no_reject_button</field>
+        <field name="model">hhexpense.line</field>
+        <field name="inherit_id" ref="hhexpense_line_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(hhexpense.hhexpense_reject_wizard_action)d']" position="replace"/>
+        </field>
+    </record>
+
+<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Search view @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+    <record id="view_review_expenses_filter" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.review.search</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="expense_num"/>
+                <filter name="group_approved_expense" string="Approved Expenses" domain="[('state', '=', 'approved')]"/>
+                <filter name="group_reviewed_expense" string="Reviewed Expenses" domain="[('state', '=', 'reviewed')]"/>
+            </search>
+         </field>
+    </record>
+
+    <record id="view_approve_expenses_filter" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.approve.search</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="group_approved_expense" string="Approved Expenses" domain="[('state', '=', 'approved')]"/>
+                <filter name="group_submitted_expense" string="Submitted Expenses" domain="[('state', '=', 'submitted')]"/>
+            </search>
+         </field>
+    </record>
+
+    <record id="view_verify_expenses_filter" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.verify.search</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="group_verified_expense" string="Verified Expenses" domain="[('state', '=', 'verified')]"/>
+                <filter name="group_reviewed_expense" string="Reviewed Expenses" domain="[('state', '=', 'reviewed')]"/>
+            </search>
+         </field>
+    </record>
+
+    <record id="view_paid_expenses_filter" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.paid.search</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="group_paid_expense" string="Paid Expenses" domain="[('state', '=', 'paid')]"/>
+                <filter name="group_posted_expense" string="Posted Expenses" domain="[('state', '=', 'posted')]"/>
+            </search>
+         </field>
+    </record>
+
+    <record id="view_non_draft_expenses_filter" model="ir.ui.view">
+        <field name="name">hhexpense.hhexpense.non_draft.search</field>
+        <field name="model">hhexpense.hhexpense</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="group_non_draft_expense" string="All Expenses" domain="[('state', '!=', 'draft')]"/>
+            </search>
+         </field>
+    </record>
+
+    <record id="hhexpense_line_view_search" model="ir.ui.view">
+        <field name="name">hhexpense.line.view.search</field>
+        <field name="model">hhexpense.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="expense_line_name"/>
+                <field name="expense_id"/>
+                <group expand="1" string="HAHA">
+                    <filter name="group_expense_emp_name_mst_id" string="By Employee and Expense" context="{'group_by': ['employee_name', 'expense_id']}"/>
+                    <filter name="group_expense_employee_name" string="By Employee" context="{'group_by': 'employee_name'}"/>
+                    <filter name="group_expense_master_id" string="By Expense" context="{'group_by': 'expense_id'}"/>
+                    <filter name="group_expense_pay_by" string="By Payment Method" context="{'group_by': 'pay_hkd_rmb'}"/>
+                    <filter name="group_expense_currency" string="By Original Currency" context="{'group_by': 'expense_line_currency'}"/>
+                    <filter name="group_expense_by_month" string="By Expense Date" context="{'group_by': 'expense_line_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="hhexpense_line_view_search_batch_number" model="ir.ui.view">
+        <field name="name">hhexpense.line.view.search.batch_number</field>
+        <field name="model">hhexpense.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="batch_number" string="Batch Number" filter_domain="[('batch_number','ilike',self)]"/>
+                <filter name="group_expense_batch_and_emp" string="By Batch Number and Employee" context="{'group_by': ['batch_number', 'employee_name']}"/>
+                <filter name="group_expense_batch_number" string="By Batch Number" context="{'group_by': 'batch_number'}"/>
+                <filter name="group_expense_employee_name" string="By Employee" context="{'group_by': 'employee_name'}"/>
+                <filter name="group_expense_master_id" string="By Expense" context="{'group_by': 'expense_id'}"/>
+                <filter name="group_expense_pay_by" string="By Payment Method" context="{'group_by': 'pay_hkd_rmb'}"/>
+                <filter name="group_expense_currency" string="By Original Currency" context="{'group_by': 'expense_line_currency'}"/>
+                <filter name="group_expense_by_month" string="By Expense Date" context="{'group_by': 'expense_line_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Action and Menuitem @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+    <!-- Reviewer can "Input anticipated upload Date" from tree view -->
+    <record id="hhexpense_anticipated_date_action_server" model="ir.actions.server">
+        <field name="name">Download Reports</field>
+        <field name="type">ir.actions.server</field>
+        <field name="sequence" eval="8"/>
+        <field name="model_id" ref="model_hhexpense_line"/>
+        <!-- New: binding_model_id, Old one: ir.value -->
+        <field name="binding_model_id" ref="model_hhexpense_line"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.create_data_structure(records)
+        </field>
+        <!--<field name="code">-->
+            <!--if user.has_group('hhexpense.group_hhexpense_reviewers'):-->
+                <!--for i, record in enumerate(records):-->
+                    <!--action = record.get_input_anticipated_date(i+1, len(records))-->
+        <!--</field>-->
+        <!--<field name="code">-->
+            <!--if user.has_group('hhexpense.group_hhexpense_reviewers'):-->
+                <!--action = {-->
+                            <!--'view_type': 'form',-->
+                            <!--'view_mode': 'form',-->
+                            <!--'res_model': 'hhexpense.payment.date',-->
+                            <!--'type': 'ir.actions.act_window',-->
+                          <!--}-->
+        <!--</field>-->
+        <!--<field name="code">-->
+                <!--if record.conditional_check_bank_record():-->
+                    <!--action = {-->
+                                <!--'view_type': 'form',-->
+                                <!--'view_mode': 'form',-->
+                                <!--'res_model': 'hhexpense.wizard.anticipated.date',-->
+                                <!--'type': 'ir.actions.act_window',-->
+                              <!--}-->
+        <!--</field>-->
+        <!--<field name="code">-->
+            <!--if record.conditional_check_bank_record():-->
+                <!--action = {-->
+                            <!--'view_type': 'form',-->
+                            <!--'view_mode': 'form',-->
+                            <!--'res_model': 'hhexpense.anticipated.date',-->
+                            <!--'type': 'ir.actions.act_window',-->
+                          <!--}-->
+        <!--</field>-->
+    </record>
+
+    <!-- Reviewer can "Input payment approved date" from tree view -->
+    <record id="hhexpense_payment_date_action_server" model="ir.actions.server">
+        <field name="name">Download FlexAccount File</field>
+        <field name="type">ir.actions.server</field>
+        <field name="sequence" eval="9"/>
+        <field name="model_id" ref="model_hhexpense_line"/>
+        <field name="binding_model_id" ref="model_hhexpense_line"/>
+        <field name="state">code</field>
+        <field name="code">
+            if record.check_if_expenses_allowed_to_post():
+            for i, record in enumerate(records):
+                action = record.get_input_payment_approved_date(i+1, len(records))
+        </field>
+        <!--<field name="code">-->
+            <!--action = model.get_input_payment_approved_date(records)-->
+        <!--</field>-->
+    </record>
+
+    <!--Release Batch File-->
+    <record id="hhexpense_batch_release_action_server" model="ir.actions.server">
+        <field name="name">Release Batch File</field>
+        <field name="type">ir.actions.server</field>
+        <field name="sequence" eval="10"/>
+        <field name="model_id" ref="model_hhexpense_line"/>
+        <field name="binding_model_id" ref="model_hhexpense_line"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = record.release_expense()
+        </field>
+    </record>
+
+    <!--Verify Batch Files-->
+    <record id="hhexpense_batch_verify_action_server" model="ir.actions.server">
+        <field name="name">Verify Batch Files</field>
+        <field name="type">ir.actions.server</field>
+        <field name="sequence" eval="11"/>
+        <field name="model_id" ref="model_hhexpense_line"/>
+        <field name="binding_model_id" ref="model_hhexpense_line"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = record.verify_expense()
+        </field>
+    </record>
+
+    <menuitem id="hhexpense_menu_root" name="E-Expense(HH)" sequence="1" web_icon="hhexpense,static/description/B.PNG"/>
+    <!--<menuitem id="hhexpense_menu_root" name="E-Expense(HH)" sequence="1"/>-->
+
+    <!-- Action for menu "Submit expenses" -->
+    <record id="hhexpense_action_expenses" model="ir.actions.act_window">
+        <field name="name">My Expenses</field>
+        <field name="res_model">hhexpense.hhexpense</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':True}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Duplicate':False, 'Delete':True}
+                                   },
+                          }
+            }</field>
+    </record>
+
+    <!-- View specification - Tree, for menu "Submit expenses" -->
+    <record id="submit_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_expenses"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Submit expenses" -->
+    <record id="submit_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_expenses"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_submit_expenses" name="My Expenses" sequence="2" parent="hhexpense.hhexpense_menu_root" action="hhexpense_action_expenses" groups="hhexpense.group_hhexpense_user"/>
+
+    <!-- Action for menu "Approve expenses" -->
+    <record id="hhexpense_action_approve_expenses" model="ir.actions.act_window">
+        <field name="name">Expenses to Approve</field>
+        <field name="res_model">hhexpense.hhexpense</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'in', ['submitted','approved']),('employee_id.parent_id.user_id', '=', uid)]</field>
+        <!--<field name="context">{'search_default_group_submitted_expense': 1}</field>-->
+        <field name="context">{
+            'search_default_group_submitted_expense': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          },
+            'checkbox': False
+            }</field>
+        <field name="search_view_id" ref="view_approve_expenses_filter"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Approve expenses" -->
+    <record id="approve_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_view_tree_no_create"/>
+        <field name="act_window_id" ref="hhexpense_action_approve_expenses"/>
+    </record>
+
+    <!-- View specification - Form, for menuitem "Approve expenses" -->
+    <record id="approve_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_view_form_no_edit"/>
+        <field name="act_window_id" ref="hhexpense_action_approve_expenses"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_approve_expenses" name="Approve Expenses" sequence="3" parent="hhexpense.hhexpense_menu_root" action="hhexpense_action_approve_expenses" groups="hhexpense.group_hhexpense_manager"/>
+
+    <!-- Action for menu "Expense History(manager)" -->
+    <record id="hhexpense_action_manager_expense_history" model="ir.actions.act_window">
+        <field name="name">Expense History</field>
+        <field name="res_model">hhexpense.hhexpense</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'not in', ['draft', 'submitted']),('employee_id.parent_id.user_id', '=', uid)]</field>
+        <!--<field name="context">{'search_default_group_submitted_expense': 1}</field>-->
+        <field name="context">{'search_default_group_submitted_expense': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          },
+            'checkbox': False}</field>
+        <field name="search_view_id" ref="view_non_draft_expenses_filter"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Expense History(manager)" -->
+    <record id="manager_expense_history_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_view_tree_no_create"/>
+        <field name="act_window_id" ref="hhexpense_action_manager_expense_history"/>
+    </record>
+
+    <!-- View specification - Form, for menuitem "Expense History(manager)" -->
+    <record id="manager_expense_history_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_view_form_no_edit"/>
+        <field name="act_window_id" ref="hhexpense_action_manager_expense_history"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_manager_expense_history" name="Expense History" sequence="4" parent="hhexpense.hhexpense_menu_root" action="hhexpense_action_manager_expense_history" groups="hhexpense.group_hhexpense_manager"/>
+
+    <menuitem id="hhexpense_menu_reviewer" name="Expenses" sequence="5" parent="hhexpense.hhexpense_menu_root" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Review Expenses" -->
+    <record id="hhexpense_action_review_expenses" model="ir.actions.act_window">
+        <field name="name">Expenses to Review</field>
+        <field name="res_model">hhexpense.hhexpense</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|', ('state', '=', 'approved'), ('state', '=', 'reviewed')]</field>
+        <!--<field name="context">{'search_default_group_approved_expense': 1}</field>-->
+        <field name="context">{
+            'search_default_group_approved_expense': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete': False}
+                                   },
+                          },
+            'checkbox': False
+            }</field>
+        <field name="search_view_id" ref="view_review_expenses_filter"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Review Expenses" -->
+    <record id="reviewed_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_view_tree_no_create"/>
+        <field name="act_window_id" ref="hhexpense_action_review_expenses"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Review Expenses" -->
+    <record id="reviewed_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_review_expenses"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_reviewed" name="Review Expenses" sequence="1" parent="hhexpense.hhexpense_menu_reviewer" action="hhexpense_action_review_expenses" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <menuitem id="hhexpense_menu_hsbc" name="HSBC" sequence="6" parent="hhexpense.hhexpense_menu_root" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Generate Reports (HSBC)" -->
+    <record id="hhexpense_action_generate_reports" model="ir.actions.act_window">
+        <field name="name">Generate HSBC Reports</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <!--  -->
+        <!-- add above code to make marked record "disappear"-->
+        <field name="domain">[('state', '=', 'reviewed'),
+                              ('has_batch_number', '=', False)]</field>
+        <!--<field name="context">{'search_default_group_expense_emp_name_mst_id': 1,}</field>-->
+        <field name="context">{
+            'search_default_group_expense_emp_name_mst_id': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{'Download Reports':True},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          }
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search"/>
+        <!--<field name="help" type="html">-->
+            <!--<p class="oe_view_nocontent_create">Create the first expense line-->
+            <!--</p>-->
+        <!--</field>-->
+    </record>
+
+    <!-- View specification - Tree, for menu "Generate Reports (HSBC)" -->
+    <record id="generate_reports_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_generate_reports"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Generate Reports (HSBC)" -->
+    <record id="generate_reports_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_generate_reports"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_generate_report" name="Generate Reports" sequence="1" parent="hhexpense.hhexpense_menu_hsbc" action="hhexpense_action_generate_reports" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Reject Expenses (From Batch)" -->
+    <!-- purpose of this view is: 2nd reviewer find mistake, ask reviewer to reject -->
+    <record id="hhexpense_action_reject_expenses" model="ir.actions.act_window">
+        <field name="name">Expenses to Reject</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('has_batch_number', '=', True), ('state', '=', 'reviewed')]</field>
+        <!--<field name="context">{'search_default_group_expense_batch_and_emp': 1}</field>-->
+        <field name="context">{
+            'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          },
+            'checkbox':False
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Reject Expenses (From Batch)" -->
+    <record id="reject_expense_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_reject_expenses"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Reject Expenses (From Batch)" -->
+    <record id="reject_expense_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_reject_expenses"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_reject_expenses" name="Reject Expenses(Batch)" sequence="2" parent="hhexpense.hhexpense_menu_hsbc" action="hhexpense_action_reject_expenses" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "View History (reviewer, HSBC, generated batch)" -->
+    <record id="hhexpense_action_view_batch_history" model="ir.actions.act_window">
+        <field name="name">Batch History</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <!-- '|', ('state', '=', 'reviewed'), ('state', '=', 'verified'),  -->
+        <field name="domain">[('has_batch_number', '=', True), ('state', '=', 'reviewed')]</field>
+        <field name="context">{'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          },
+            'checkbox': False}</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "View History (reviewer, HSBC, generated batch)" -->
+    <record id="view_batch_history_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_view_batch_history"/>
+    </record>
+
+    <!-- View specification - Form, for menu "View History (reviewer, HSBC, generated batch)" -->
+    <record id="view_batch_history_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form_no_reject_button"/>
+        <field name="act_window_id" ref="hhexpense_action_view_batch_history"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_view_batch_history" name="View History" sequence="3" parent="hhexpense.hhexpense_menu_hsbc" action="hhexpense_action_view_batch_history" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <menuitem id="hhexpense_menu_flexsystem" name="FlexSystem" sequence="7" parent="hhexpense.hhexpense_menu_root" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Post Batch" -->
+    <record id="hhexpense_action_post_batch" model="ir.actions.act_window">
+        <field name="name">Batch to Post</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <!--<field name="domain">[('state', 'in', ['verified', 'posted'])]</field>-->
+        <field name="domain">[('state', '=', 'verified')]</field>
+        <!--<field name="context">{'search_default_group_expense_batch_and_emp': 1}</field>-->
+        <field name="context">{
+            'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{'Download FlexAccount File':True},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          }
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Post Batch" -->
+    <record id="post_batch_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_post_batch"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Post Batch" -->
+    <record id="post_batch_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_post_batch"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_post_batch" name="Post Batch" sequence="1" parent="hhexpense.hhexpense_menu_flexsystem" action="hhexpense_action_post_batch" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Post History" -->
+    <record id="hhexpense_action_post_batch_history" model="ir.actions.act_window">
+        <field name="name">Post History</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <!--<field name="domain">[('state', 'in', ['verified', 'posted'])]</field>-->
+        <field name="domain">[('state', '=', 'posted')]</field>
+        <!--<field name="context">{'search_default_group_expense_batch_and_emp': 1}</field>-->
+        <field name="context">{'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          },
+            'checkbox':False
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Post History" -->
+    <record id="post_batch_history_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_post_batch_history"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Post History" -->
+    <record id="post_batch_history_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_post_batch_history"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_post_batch_history" name="View History" sequence="2" parent="hhexpense.hhexpense_menu_flexsystem" action="hhexpense_action_post_batch_history" groups="hhexpense.group_hhexpense_reviewers"/>
+
+    <!-- Action for menu "Verify Batch" -->
+    <record id="hhexpense_action_verify_batch" model="ir.actions.act_window">
+        <field name="name">Batch to Verify</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'reviewed'), ('has_batch_number', '=', True)]</field>
+        <!--<field name="context">{'search_default_group_expense_batch_and_emp': 1}</field>-->
+        <field name="context">{
+            'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{'Verify Batch Files':True},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          }
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Verify Batch" -->
+    <record id="verify_batch_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_verify_batch"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Verify Batch" -->
+    <record id="verify_batch_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_verify_batch"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_verify_batch" name="Verify Batch" sequence="8" parent="hhexpense.hhexpense_menu_root" action="hhexpense_action_verify_batch" groups="hhexpense.group_hhexpense_verifiers"/>
+
+    <!-- Action for menu "Release Batch" -->
+    <record id="hhexpense_action_release_batch" model="ir.actions.act_window">
+        <field name="name">Batch to Release</field>
+        <field name="res_model">hhexpense.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'verified')]</field>
+        <!--<field name="context">{'search_default_group_expense_batch_and_emp': 1}</field>-->
+        <field name="context">{
+            'search_default_group_expense_batch_and_emp': 1,
+            'actionItems':{
+                           'list': {
+                                    'action':{'Release Batch File':True},
+                                    'other':{'Export':False, 'Delete':False}
+                                   },
+                           'form': {
+                                    'action':{},
+                                    'other':{'Delete':False}
+                                   },
+                          }
+            }</field>
+        <field name="search_view_id" ref="hhexpense_line_view_search_batch_number"/>
+    </record>
+
+    <!-- View specification - Tree, for menu "Release Batch" -->
+    <record id="release_batch_view_specification_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hhexpense_line_view_tree"/>
+        <field name="act_window_id" ref="hhexpense_action_release_batch"/>
+    </record>
+
+    <!-- View specification - Form, for menu "Release Batch" -->
+    <record id="release_batch_view_specification_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hhexpense_line_view_form"/>
+        <field name="act_window_id" ref="hhexpense_action_release_batch"/>
+    </record>
+
+    <menuitem id="hhexpense_menu_release_batch" name="Release Batch" sequence="9" parent="hhexpense.hhexpense_menu_root" action="hhexpense_action_release_batch" groups="hhexpense.group_hhexpense_verifiers"/>
+
+
+</odoo>

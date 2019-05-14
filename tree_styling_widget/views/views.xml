@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="cell_coloring_widget.list">
+      <field name="name">cell_coloring_widget list</field>
+      <field name="model">cell_coloring_widget.cell_coloring_widget</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="cell_coloring_widget.action_window">
+      <field name="name">cell_coloring_widget window</field>
+      <field name="res_model">cell_coloring_widget.cell_coloring_widget</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="cell_coloring_widget.action_server">
+      <field name="name">cell_coloring_widget server</field>
+      <field name="model_id" ref="model_cell_coloring_widget_cell_coloring_widget"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="cell_coloring_widget" id="cell_coloring_widget.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="cell_coloring_widget.menu_1" parent="cell_coloring_widget.menu_root"/>
+    <menuitem name="Menu 2" id="cell_coloring_widget.menu_2" parent="cell_coloring_widget.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="cell_coloring_widget.menu_1_list" parent="cell_coloring_widget.menu_1"
+              action="cell_coloring_widget.action_window"/>
+    <menuitem name="Server to list" id="cell_coloring_widget" parent="cell_coloring_widget.menu_2"
+              action="cell_coloring_widget.action_server"/>
+    -->
+  </data>
+</odoo>

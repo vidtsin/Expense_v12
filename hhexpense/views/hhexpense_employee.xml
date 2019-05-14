@@ -1,0 +1,15 @@
+<?xml version = "1.0"?>
+<odoo>
+    <record id="hr_employee_action_update_employee_info" model="ir.actions.server">
+        <field name="name">Update Employee Info</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="binding_model_id" ref="model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">
+            if user.has_group('hhexpense.group_hhexpense_admin'):
+                for record in records:
+                    action = record.get_employee_info()
+        </field>
+    </record>
+</odoo>

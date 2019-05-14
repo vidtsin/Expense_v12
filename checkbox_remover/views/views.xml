@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="checkbox_remove.list">
+      <field name="name">checkbox_remove list</field>
+      <field name="model">checkbox_remove.checkbox_remove</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="checkbox_remove.action_window">
+      <field name="name">checkbox_remove window</field>
+      <field name="res_model">checkbox_remove.checkbox_remove</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="checkbox_remove.action_server">
+      <field name="name">checkbox_remove server</field>
+      <field name="model_id" ref="model_checkbox_remove_checkbox_remove"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="checkbox_remove" id="checkbox_remove.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="checkbox_remove.menu_1" parent="checkbox_remove.menu_root"/>
+    <menuitem name="Menu 2" id="checkbox_remove.menu_2" parent="checkbox_remove.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="checkbox_remove.menu_1_list" parent="checkbox_remove.menu_1"
+              action="checkbox_remove.action_window"/>
+    <menuitem name="Server to list" id="checkbox_remove" parent="checkbox_remove.menu_2"
+              action="checkbox_remove.action_server"/>
+    -->
+  </data>
+</odoo>

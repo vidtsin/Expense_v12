@@ -1,0 +1,323 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- DebitCategory tree view -->
+    <record id="hhexpense_debit_category_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.debit.category.view.tree</field>
+        <field name="model">hhexpense.debit.category</field>
+        <field name="arch" type="xml">
+            <tree default_order="expense_category asc">
+                <field name="ledger_code" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                <field name="expense_type" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                <field name="expense_category"/>
+                <field name="debit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- DebitCategory form view -->
+    <record id="hhexpense_debit_category_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.debit.category.view.form</field>
+        <field name="model">hhexpense.debit.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="ledger_code" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                        <field name="expense_type" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                        <field name="check_user_in_acc_group" invisible="1"/>
+                        <field name="expense_category" attrs="{'readonly': [('check_user_in_acc_group', '=', False)]}"/>
+                        <field name="debit_acc" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- DepartmentToExpenseType tree view -->
+    <record id="hhexpense_convert_deptoexp_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.convert.deptoexp.view.tree</field>
+        <field name="model">hhexpense.convert.deptoexp</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="user_department"/>
+                <field name="convert_to_expense_type" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- DepartmentToExpenseType form view -->
+    <record id="hhexpense_convert_deptoexp_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.convert.deptoexp.view.form</field>
+        <field name="model">hhexpense.convert.deptoexp</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="check_user_in_acc_group_deptoexp" invisible="1"/>
+                        <field name="user_department" attrs="{'readonly': [('check_user_in_acc_group_deptoexp', '=', False)]}"/>
+                        <field name="convert_to_expense_type" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- CurrencyRate tree view -->
+    <record id="hhexpense_currency_rate_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.currency.rate.view.tree</field>
+        <field name="model">hhexpense.currency.rate</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="currency"/>
+                <field name="rate_month" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                <field name="exchange_rate" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- CurrencyRate form view -->
+    <record id="hhexpense_currency_rate_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.currency.rate.view.form</field>
+        <field name="model">hhexpense.currency.rate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="check_user_in_acc_group_currency_rate" invisible="1"/>
+                        <field name="currency" attrs="{'readonly': [('check_user_in_acc_group_currency_rate', '=', False)]}"/>
+                        <field name="rate_month" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                        <field name="exchange_rate" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- HHHolidayDate tree view -->
+    <record id="hhexpense_holiday_date_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.holiday.date.view.tree</field>
+        <field name="model">hhexpense.holiday.date</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="holiday_date"/>
+                <field name="holiday_description"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- HHHolidayDate form view -->
+    <record id="hhexpense_holiday_date_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.holiday.date.view.form</field>
+        <field name="model">hhexpense.holiday.date</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="holiday_date"/>
+                        <field name="holiday_description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Team Tree view -->
+    <record id="hhexpense_team_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.team.tree</field>
+        <field name="model">hhexpense.team</field>
+        <field name="arch" type="xml">
+            <tree string="Team Tree">
+                <field name="employee_name"/>
+                <field name="team"/>
+                <field name="analysis_code"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Team form view -->
+    <record id="hhexpense_team_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.team.form</field>
+        <field name="model">hhexpense.team</field>
+        <field name="arch" type="xml">
+            <form string="Team Form">
+                <sheet>
+                    <group col="4">
+                        <field name="employee_name"/>
+                        <field name="team"/>
+                        <field name="analysis_code"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Team Kanban view -->
+    <record id="hhexpense_team_view_kanban" model="ir.ui.view" >
+        <field name="name">hhexpense.team.kanban</field>
+        <field name="model">hhexpense.team</field>
+        <field name="arch" type="xml">
+            <kanban class="o_hr_employee_kanban">
+                <templates>
+                    <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_details">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="employee_name"/>
+                                        <field name="team"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <ul>
+                                <li t-if="record.analysis_code.raw_value"><i class="fa fa-star"></i> <field name="analysis_code"/></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ExpenseCategory tree view -->
+    <record id="hhexpense_expense_category_view_tree" model="ir.ui.view">
+        <field name="name">hhexpense.expense.category.view.tree</field>
+        <field name="model">hhexpense.expense.category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="category"/>
+                <field name="acc_no" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ExpenseCategory form view -->
+    <record id="hhexpense_expense_category_view_form" model="ir.ui.view">
+        <field name="name">hhexpense.expense.category.view.form</field>
+        <field name="model">hhexpense.expense.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="check_user_in_acc_group" invisible="1"/>
+                        <field name="category"  attrs="{'readonly': [('check_user_in_acc_group', '=', False)]}"/>
+                        <field name="acc_no" groups="hhexpense.group_hhexpense_reviewers,hhexpense.group_hhexpense_verifiers"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- DebitCategory search view -->
+    <record id="hhexpense_debit_category_view_search" model="ir.ui.view">
+        <field name="name">hhexpense.debit.category.view.search</field>
+        <field name="model">hhexpense.debit.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="expense_category" string="Records" filter_domain="['|', ('expense_category','ilike',self), ('debit_acc','ilike',self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ExpenseCategory search view -->
+    <record id="hhexpense_expense_category_view_search" model="ir.ui.view">
+        <field name="name">hhexpense.expense.category.view.search</field>
+        <field name="model">hhexpense.expense.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="category" string="Records" filter_domain="[('category','ilike',self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- DepartmentToExpenseType search view -->
+    <record id="hhexpense_convert_deptoexp_view_search" model="ir.ui.view">
+        <field name="name">hhexpense.convert.deptoexp.view.search</field>
+        <field name="model">hhexpense.convert.deptoexp</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_department" string="Department list" filter_domain="[('user_department','ilike',self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="hhexpense_menu_config" name="Configuration" sequence="10" parent="hhexpense_menu_root" groups="-hhexpense.group_hhexpense_reviewers,-hhexpense.group_hhexpense_verifiers,hhexpense.group_hhexpense_admin"/>
+
+    <record id="hhexpense_debit_category_action" model="ir.actions.act_window">
+        <!-- Manage expense type / category and corresponding debit account -->
+        <field name="name">Account Expense Categories</field>
+        <field name="res_model">hhexpense.debit.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="hhexpense_debit_category_view_search"/>
+    </record>
+
+    <menuitem id="hhexpense_debit_category_menu" name="Expense Categories(Account)" sequence="1" parent="hhexpense_menu_config" action="hhexpense_debit_category_action"/>
+
+    <record id="hhexpense_expense_category_action" model="ir.actions.act_window">
+        <field name="name">User Expense Categories</field>
+        <field name="res_model">hhexpense.expense.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="hhexpense_expense_category_menu" name="Expense Categories(User)" sequence="2" parent="hhexpense_menu_config" action="hhexpense_expense_category_action"/>
+
+    <record id="hhexpense_convert_deptoexp_action" model="ir.actions.act_window">
+        <!-- Manage relationship between user's department and expense type -->
+        <field name="name">Department Mapping</field>
+        <field name="res_model">hhexpense.convert.deptoexp</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="hhexpense_convert_deptoexp_menu" name="Department Mapping" sequence="4" parent="hhexpense_menu_config" action="hhexpense_convert_deptoexp_action"/>
+
+    <record id="hhexpense_team_action" model="ir.actions.act_window">
+        <field name="name">Team</field>
+        <field name="res_model">hhexpense.team</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <!--<field name="view_id" ref="hhexpense_team_view_kanban"/>-->
+        <!--<field name="help" type="html">-->
+            <!--<p class="oe_view_nocontent_create">-->
+                <!--Click to create a team.-->
+            <!--</p>-->
+        <!--</field>-->
+    </record>
+
+    <menuitem id="hhexpense_team_menu" name="Team Mapping" sequence="5" parent="hhexpense_menu_config" action="hhexpense_team_action" />
+
+    <record id="hhexpense_currency_rate_action" model="ir.actions.act_window">
+        <!-- Update/Manage currency ~ rate -->
+        <field name="name">Import from HHERP</field>
+        <field name="res_model">hhexpense.currency.rate</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="hhexpense_currency_rate_action_server" model="ir.actions.server">
+        <field name="name">Update currency rate from HHERP</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hhexpense_currency_rate"/>
+        <field name="binding_model_id" ref="model_hhexpense_currency_rate"/>
+        <field name="state">code</field>
+        <field name="code">
+            if user.has_group('hhexpense.group_hhexpense_reviewers'):
+                for record in records:
+                    action = record.update_currency_rate()
+        </field>
+    </record>
+
+    <menuitem id="hhexpense_currency_rate_menu" name="Currency Rate" sequence="6" parent="hhexpense_menu_config" action="hhexpense_currency_rate_action"/>
+
+    <record id="hhexpense_holiday_date_action" model="ir.actions.act_window">
+        <field name="name">HH Holiday List</field>
+        <field name="res_model">hhexpense.holiday.date</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="hhexpense_holiday_date_menu" name="HH Holiday" sequence="7" parent="hhexpense_menu_config" action="hhexpense_holiday_date_action"/>
+
+
+
+
+
+</odoo>
+

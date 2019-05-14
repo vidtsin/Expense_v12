@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_verify_reviewer_email_template" model="mail.template">
+          <field name="name">expense e-mail verify reviewer template</field>
+          <field name="email_from"><![CDATA["${object.company_id.name|safe}" <${(object.company_id.email or user.email)|safe}>]]></field>
+          <field name="subject">Expense Status Verified Notification To Reviewer ${object.reviewer_name}</field>
+          <field name="email_to">${object.reviewer_email}</field>
+          <field name="lang">${object.lang}</field>
+          <field name="model_id" ref="hhexpense.model_hhexpense_hhexpense"/>
+          <field name="auto_delete" eval="False"/>
+          <field name="body_html">
+                <![CDATA[
+              % set company = record and record.company_id or user.company_id
+
+              <div style="user-select:none; padding:0; margin:0;">
+                  <table border="0" width="100%" style="border-collapse:collapse; background-color: rgb(255, 255, 255); " summary="o_mail_notification">
+                    <tbody>
+                        <!-- HEADER -->
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table width="590" border="0" cellpadding="0" bgcolor="#D92330" style="min-width: 590px; background-color: #D92330; padding: 20px; border-collapse:separate;">
+                                    <tr>
+                                        <td valign="middle">
+                                            <span style="font-size:20px; color:white; font-weight: bold;">
+                                                Dear Reviewer ${object.reviewer_name},
+                                            </span>
+                                        </td>
+                                        <td valign="middle" align="right">
+                                           <a href="http://www.hunghingprinting.com/"><img src="https://image.ibb.co/j4D9zS/HHLogo4_opt.jpg"  style="width: 100px; padding: 0px; margin: 0px;" alt="${company.name}"/></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- CONTENT -->
+                        <tr>
+                            <td align="center">
+                                <table width="590" border="0"
+                                style=" background-color:rgb(247,247,247); padding: 50px; border-collapse:separate;">
+                                    <tbody>
+                                        <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                        <p>${(user.name)} has already <strong>VERIFIED</strong> an expense <strong>${object.name}</strong>, please <a href=${object.to_pay_url}>check</a> in your system.</p><br/>
+                                        </td>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- FOOTER -->
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table width="590" border="0" cellpadding="0" bgcolor="#D92330" style="min-width: 590px; background-color: #D92330; padding: 20px; border-collapse:separate;">
+                                    <tr>
+                                        <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                            ${company.name}<br/>
+                                            ${company.phone or ''}
+                                        </td>
+                                        <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                            % if company.email:
+                                            <a href="mailto:${company.email}" style="text-decoration:none; color: white;">${company.email}</a><br/>
+                                            % endif
+                                            % if company.website:
+                                            <a href="${company.website}" style="text-decoration:none; color: white;">
+                                            ${company.website}
+                                            </a>
+                                            % endif
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                Powered by <a target="_blank" style="text-decoration: none;" href="http://www.hunghingprinting.com/">HungHing</a><br/>
+                            </td>
+                        </tr>
+                    </tbody>
+                   </table>
+              </div>
+              ]]>
+          </field>
+       </record>
+    </data>
+</odoo>
+
+
+
+

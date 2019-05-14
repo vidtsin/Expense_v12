@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- china_bank_acc tree view -->
+    <!--<record id="hhexpense_china_bank_acc_view_tree" model="ir.ui.view">-->
+        <!--<field name="name">hhexpense.china.bank.acc.view.tree</field>-->
+        <!--<field name="model">hhexpense.china.bank.acc</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<tree>-->
+                <!--<field name="employee_name"/>-->
+                <!--<field name="employee_email"/>-->
+                <!--<field name="china_bank_acc"/>-->
+            <!--</tree>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <!-- china_bank_acc form view -->
+    <!--<record id="view_employee_form" model="ir.ui.view">-->
+       <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<form>-->
+                <!--<field name="rmb_account_no"/>-->
+            <!--</form>-->
+        <!--</field>-->
+    <!--</record>-->
+
+    <record model="ir.ui.view" id="view_employee_form">
+        <field name="name">hr.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <field name="bank_account_id" position="after">
+                <field name="rmb_account_no"/>
+            </field>
+        </field>
+    </record>
+
+    <!--<record id="hhexpense_china_bank_acc_action" model="ir.actions.act_window">-->
+        <!--&lt;!&ndash; Update/Manage china_bank_acc &ndash;&gt;-->
+        <!--<field name="name">China Bank Account List</field>-->
+        <!--<field name="res_model">hhexpense.china.bank.acc</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+    <!--</record>-->
+
+    <!--<menuitem id="hhexpense_china_bank_acc_menu" name="China Bank Account" parent="hhexpense_menu_config" action="hhexpense_china_bank_acc_action"/>-->
+
+    <!--&lt;!&ndash;update approving reviewing verifying manager info&ndash;&gt;-->
+    <!--<record id="hhexpense_china_bank_acc_server" model="ir.actions.server">-->
+        <!--<field name="name">Update China Bank Account</field>-->
+        <!--<field name="type">ir.actions.server</field>-->
+        <!--<field name="model_id" ref="model_hhexpense_china_bank_acc"/>-->
+        <!--<field name="binding_model_id" ref="model_hhexpense_china_bank_acc"/>-->
+        <!--<field name="state">code</field>-->
+        <!--<field name="code">-->
+            <!--for record in records:-->
+                <!--action = record.update_china_bank_acc_list()-->
+        <!--</field>-->
+    <!--</record>-->
+
+
+</odoo>
